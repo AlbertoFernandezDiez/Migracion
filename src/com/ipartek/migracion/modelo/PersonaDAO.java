@@ -125,11 +125,7 @@ public class PersonaDAO implements Persistable<Persona> {
 
 		resultado = ps.executeUpdate();
 		if (resultado == 1) {
-			/*sql = "SELECT LAST_INSERT_ID();";
-			ps.close();
-			ps = conex.getConnection().prepareStatement(sql);
-*/
-		//	ResultSet rs = ps.executeQuery();
+		
 			ResultSet rs = ps.getGeneratedKeys();
 
 			if (rs.next()) {

@@ -33,6 +33,8 @@ public class DbConnection {
 	         System.out.println(e);
 	      }
 	   }
+	   
+	   
 	   /**Permite retornar la conexi�n*/
 	   public Connection getConnection(){
 	      return connection;

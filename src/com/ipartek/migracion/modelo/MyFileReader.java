@@ -27,7 +27,7 @@ public class MyFileReader {
 	 *            <code>String</code> ruta del fichero a leer
 	 * @throws FileNotFoundException
 	 */
-	public MyFileReader(String path) throws FileReaderException, FileNotFoundException {
+	public MyFileReader(String path) throws FileReaderException {
 
 		abrirFichero(path);
 
@@ -37,9 +37,8 @@ public class MyFileReader {
 	 * Metodo que nos permite abrir un fichero para iniciar su lectura desde el comienzo del mismo
 	 * @param path  <code>String</code> ruta del fichero a leer
 	 * @throws FileReaderException
-	 * @throws FileNotFoundException
 	 */
-	public void abrirFichero(String path) throws FileReaderException, FileNotFoundException {
+	public void abrirFichero(String path) throws FileReaderException {
 		if (path == null) {
 			throw new FileReaderException(FileReaderException.RUTA_NULL);
 		}
@@ -50,7 +49,12 @@ public class MyFileReader {
 			throw new FileReaderException(FileReaderException.RUTA_ERRONEA);
 		}
 
-		fr = new FileReader(myFile);
+		try {
+			fr = new FileReader(myFile);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		br = new BufferedReader(fr);
 	}
 

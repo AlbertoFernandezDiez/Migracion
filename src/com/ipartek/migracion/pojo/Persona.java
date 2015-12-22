@@ -3,43 +3,63 @@ package com.ipartek.migracion.pojo;
 import java.sql.Date;
 
 import com.ipartek.migracion.excepciones.PersonaException;
+import com.ipartek.migracion.validadores.Utilidades;
+import com.ipartek.migracion.validadores.UtilidadesException;
 import com.ipartek.migracion.validadores.UtilidadesFechas;
 
 public class Persona {
-	
+
 	private int id;
-	private String nombre, email, dni, observaciones,pass;
+	private String nombre, email, dni, observaciones, pass;
 	private java.sql.Date fechaNacimiento;
-	
-	
+
 	public Persona() {
 		super();
 		this.id = -1;
 		this.nombre = "";
-		this.email ="";
-		this.dni ="";
-		this.observaciones ="";
-		this.pass ="";
+		this.email = "";
+		this.dni = "";
+		this.observaciones = "";
+		this.pass = "";
 		this.fechaNacimiento = new Date(System.currentTimeMillis());
 	}
 
-	public Persona (String line) throws PersonaException{
+	public Persona(String line) throws PersonaException, NullPointerException, UtilidadesException {
 		String[] campos = line.split(",");
-		
-	
-		
-		if (campos.length != 7){
+
+		if (campos.length != 7) {
 			throw new PersonaException(PersonaException.CAMPOS_INSUFICIENTES);
 		}
+
+		String nombre = campos[0] + " " + campos[1] + " " + campos[2];
+
+		int edad = Integer.parseInt(campos[3]);
+		Date fecha = UtilidadesFechas.calcularFecha(edad);
+
+		String email = campos[4];
+
+		if (!Utilidades.validarEmail(email)) {
+			throw new PersonaException(PersonaException.EMAIL_NO_VALIDO);
+		}
+
+		String dni = campos[5];
+
+		if (!Utilidades.validarDNI(dni)) {
+			throw new PersonaException(PersonaException.DNI_NO_VALIDO);
+		}
+
+		String observacion = campos[6];
+
 		
-		String nombre = campos[0] + " " + campos[1] + " "+ campos[2];
-		
-		int edad =  Integer.parseInt(campos[3]);
-		Date fecha = UtilidadesFechas.calcularFecha(edad); 
-		
-		
-		
+
+		this.setDni(dni);
+		this.setEmail(email);
+		this.setFechaNacimiento(fecha);
+		this.setNombre(nombre);
+		this.setObservaciones(observacion);
+
 	}
+
 	public String getPass() {
 		return pass;
 	}
@@ -47,8 +67,6 @@ public class Persona {
 	public void setPass(String pass) {
 		this.pass = pass;
 	}
-
-	
 
 	public String getEmail() {
 		return email;
@@ -98,8 +116,6 @@ public class Persona {
 		this.nombre = nombre;
 	}
 
-	
-
 	@Override
 	public String toString() {
 		return "Persona [id=" + id + ", nombre=" + nombre + ", email=" + email + ", dni=" + dni + ", observaciones="
@@ -119,7 +135,6 @@ public class Persona {
 		result = prime * result + ((pass == null) ? 0 : pass.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
