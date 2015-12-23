@@ -64,16 +64,34 @@ public class Main {
 
 		ArrayList<Errores> errores = new ArrayList<Errores>();
 		String linea = null;
-		PersonaDAO pDao = new PersonaDAO();
+		PersonaDAO pDao = null;
+		try {
+			pDao = new PersonaDAO();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		while ((linea = mfr.leerLinea()) != null) {
 			try {
 				p = new Persona(linea);
 				pDao.insert(p);
 				correctos++;
 			}catch(Exception e){
-				errores.add(new Errores(e.getMessage(), linea));
+				
+				if( e instanceof java.lang.NullPointerException){				
+				errores.add(new Errores("Null Pointer", linea));
+				}else{
+					errores.add(new Errores(e.getMessage(), linea));
+				}
 				erroneos++;
 			}
+		}
+		
+		try {
+			pDao.closeConnection(false);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		File dirInformes = new File(path + " - Informes");

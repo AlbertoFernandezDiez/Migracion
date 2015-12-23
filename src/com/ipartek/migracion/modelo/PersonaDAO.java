@@ -10,6 +10,31 @@ import com.ipartek.migracion.pojo.Persona;
 
 public class PersonaDAO implements Persistable<Persona> {
 
+	private DbConnection conex;
+
+	public PersonaDAO() throws SQLException {
+		conex = new DbConnection();
+		conex.getConnection().setAutoCommit(false);
+	}
+
+	/**
+	 * Metodo que cierra la conexion actual
+	 * @param rollback <code>boolean</code> 
+	 * <ul>
+	 * <li><code>true</code> para hacer rollback</li>
+	 * <li><code>false</code> para hacer commit</li>
+	 * </ul>
+	 * @throws SQLException
+	 */
+	public void closeConnection(boolean rollback) throws SQLException {
+		if (rollback){
+		conex.getConnection().rollback();
+		}else{
+			conex.getConnection().commit();
+		}
+		conex.desconectar();
+	}
+
 	@Override
 	public List<Persona> getAll() throws SQLException {
 
@@ -41,19 +66,18 @@ public class PersonaDAO implements Persistable<Persona> {
 		DbConnection conex = new DbConnection();
 
 		String sql = "select * from `persona` where `id` = ?;";
-		
 
 		PreparedStatement ps = conex.getConnection().prepareStatement(sql);
 
 		ps.setInt(1, id);
-		
+
 		ResultSet rs = ps.executeQuery();
 
 		Persona p = null;
 		if (rs.next()) {
 			p = mapeo(rs);
 		}
-		
+
 		return p;
 	}
 
@@ -67,84 +91,83 @@ public class PersonaDAO implements Persistable<Persona> {
 		PreparedStatement ps = conex.getConnection().prepareStatement(sql);
 
 		ps.setInt(1, id);
-		
+
 		ps.setInt(1, id);
 		resultado = ps.executeUpdate();
-		
+
 		ps.close();
 		conex.desconectar();
-		
+
 		return resultado == 1;
 	}
 
 	@Override
-	public boolean update(Persona persistable) throws SQLException  {
+	public boolean update(Persona persistable) throws SQLException {
 		int resultado = -1;
-		
-		if (persistable != null){
-		
-		DbConnection conex = new DbConnection();
 
-		String sql = "UPDATE `iparsex`.`persona` SET `nombre`=?, `dni`=?, "
-				+ "`fecha_nacimiento`=?, `observaciones`=?, `pass`=?, `email`=?"
-				+ " WHERE  `id`=?;";
+		if (persistable != null) {
 
-		PreparedStatement ps = conex.getConnection().prepareStatement(sql);
+			DbConnection conex = new DbConnection();
 
-		ps.setString(1, persistable.getNombre());
-		ps.setString(2, persistable.getDni());
-		ps.setDate(3, persistable.getFechaNacimiento());
-		ps.setString(4, persistable.getObservaciones());
-		ps.setString(5, persistable.getPass());
-		ps.setString(6, persistable.getEmail());
-		ps.setInt(7, persistable.getId());
+			String sql = "UPDATE `iparsex`.`persona` SET `nombre`=?, `dni`=?, "
+					+ "`fecha_nacimiento`=?, `observaciones`=?, `pass`=?, `email`=?" + " WHERE  `id`=?;";
 
-		resultado = ps.executeUpdate();
+			PreparedStatement ps = conex.getConnection().prepareStatement(sql);
+
+			ps.setString(1, persistable.getNombre());
+			ps.setString(2, persistable.getDni());
+			ps.setDate(3, persistable.getFechaNacimiento());
+			ps.setString(4, persistable.getObservaciones());
+			ps.setString(5, persistable.getPass());
+			ps.setString(6, persistable.getEmail());
+			ps.setInt(7, persistable.getId());
+
+			resultado = ps.executeUpdate();
 		}
-		
+
 		return resultado == 1;
 	}
 
 	@Override
 	public int insert(Persona persistable) throws SQLException {
 		int resultado = -1;
-		if (persistable !=  null){
-		DbConnection conex = new DbConnection();
+		if (persistable != null) {
+			//DbConnection conex = new DbConnection();
 
-		String sql = "INSERT INTO `iparsex`.`persona` (`nombre`, `dni`, `fecha_nacimiento`,"
-				+ " `observaciones`, `pass`, `email`) VALUES (?, ?, ?, ?, ?, ?);";
+			String sql = "INSERT INTO `iparsex`.`persona` (`nombre`, `dni`, `fecha_nacimiento`,"
+					+ " `observaciones`, `pass`, `email`) VALUES (?, ?, ?, ?, ?, ?);";
 
-		PreparedStatement ps = conex.getConnection().prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = conex.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 
-		ps.setString(1, persistable.getNombre());
-		ps.setString(2, persistable.getDni());
-		ps.setDate(3, persistable.getFechaNacimiento());
-		ps.setString(4, persistable.getObservaciones());
-		ps.setString(5, persistable.getPass());
-		ps.setString(6, persistable.getEmail());
+			ps.setString(1, persistable.getNombre());
+			ps.setString(2, persistable.getDni());
+			ps.setDate(3, persistable.getFechaNacimiento());
+			ps.setString(4, persistable.getObservaciones());
+			ps.setString(5, persistable.getPass());
+			ps.setString(6, persistable.getEmail());
 
-		resultado = ps.executeUpdate();
-		if (resultado == 1) {
-		
-			ResultSet rs = ps.getGeneratedKeys();
+			resultado = ps.executeUpdate();
+			if (resultado == 1) {
 
-			if (rs.next()) {
-				resultado = rs.getInt(1);
-				persistable.setId(resultado);
-			}else{
-				throw new SQLException("Creating user failed, no ID obtained");
+				ResultSet rs = ps.getGeneratedKeys();
+
+				if (rs.next()) {
+					resultado = rs.getInt(1);
+					persistable.setId(resultado);
+				} else {
+					throw new SQLException("Creating user failed, no ID obtained");
+				}
+
+				// Cerramos los recursos en orden inverso
+				rs.close();
+			} else {
+				resultado = -1;
 			}
 
-			// Cerramos los recursos en orden inverso
-			rs.close();
-		}else{
-			resultado = -1;
+			ps.close();
+		//	conex.desconectar();
 		}
 
-		ps.close();
-		conex.desconectar();
-		}
-		
 		return resultado;
 	}
 
