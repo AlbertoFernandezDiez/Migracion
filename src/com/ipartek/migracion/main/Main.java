@@ -108,7 +108,7 @@ public class Main {
 			informeErrores(path, errores);
 		}
 
-		System.out.println("\n\tTerminado proceso de migracion en:\t " + (System.currentTimeMillis() - time) + "ms");
+		System.out.println("\n\tTerminado proceso de migracion en:\t " + (System.currentTimeMillis() - time)/1000 + "s");
 
 	}
 

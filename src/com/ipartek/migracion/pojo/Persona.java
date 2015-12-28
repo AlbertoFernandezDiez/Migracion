@@ -24,6 +24,22 @@ public class Persona {
 		this.fechaNacimiento = new Date(System.currentTimeMillis());
 	}
 
+	/**
+	 * Constructor que recibe los parametros en una linea CSV (Coma Separated Value)
+	 * @param line {@code String} Linea que contiene los datos a parsear:<br>
+	 * <ul>
+	 *<li>[0] Nombre</li>
+	 *<li>[1] 1º Apellido</li>
+	 *<li>[2] 2º Apellido</li>
+	 *<li>[3] Edad</li>
+	 *<li>[4] Email</li>
+	 *<li>[5] DNI</li>
+	 *<li>[6] Rol</li>
+	 *</ul> 
+	 * @throws PersonaException
+	 * @throws NullPointerException
+	 * @throws UtilidadesException
+	 */
 	public Persona(String line) throws PersonaException, NullPointerException, UtilidadesException {
 		String[] campos = line.split(",");
 
